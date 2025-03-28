@@ -1,0 +1,17 @@
+[project]
+name = "figma-mcp-server"
+version = "0.1.0"
+description = "A MCP server project"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [ "mcp>=1.6.0", "websockets"]
+[[project.authors]]
+name = "roy.yan"
+email = "roy.yan@ccegroup.cn"
+
+[build-system]
+requires = [ "hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+figma-mcp-server = "figma_mcp_server:main"
