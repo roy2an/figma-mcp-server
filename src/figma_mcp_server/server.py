@@ -23,7 +23,7 @@ if sys.platform == "win32" and os.environ.get('PYTHONIOENCODING') is None:
     sys.stderr.reconfigure(encoding="utf-8")
 
 # 配置日志
-log_file = os.path.expanduser('~/figma_mcp_server.log')
+log_file = os.path.expanduser(f"./logs/{time.strftime('%Y-%m-%d')}.log")
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -122,12 +122,50 @@ async def main():
         """List available tools"""
         return [
             types.Tool(
-                name="figma_list_components",
-                description="Get all components of the document in Figma",
+                name="figma_get_root_layers",
+                description="Get all root layers of the document in Figma",
                 inputSchema={
                     "type": "object",
                     "properties": {},
                     "required": [],
+                }
+            ),
+            types.Tool(
+                name="figma_get_selection",
+                description="Get the current selection in Figma",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                    },
+                    "required": [],
+                }
+            ),
+            types.Tool(
+                name="figma_get_node_children",
+                description="Get all components of the Node in Figma",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "nodeId": {
+                            "type": "string",
+                            "description": "ID of the node to get components from"
+                        }
+                    },
+                    "required": ["nodeId"],
+                }
+            ),
+            types.Tool(
+                name="figma_export_node",
+                description="Export a Node from Figma",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "nodeId": {
+                            "type": "string",
+                            "description": "ID of the node to export"
+                        }
+                    },
+                    "required": ["nodeId"],
                 }
             ),
         ]

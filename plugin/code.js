@@ -28,8 +28,15 @@ function processCommand(command) {
     
     // Dispatch to appropriate command handler
     switch (command.command) {
+      case 'get_root_layers':
+        return handleGetRootLayers(command);
       case 'get_selection':
         return handleGetSelection(command);
+      case 'get_node_children':
+        return handleGetNodeChildren(command);
+      case 'export_node':
+        return handleExportNode(command);
+      
       case 'create_rectangle':
         return handleCreateRectangle(command);
       case 'create_text':
@@ -50,10 +57,7 @@ function processCommand(command) {
         return handleUpdateNode(command);
       case 'delete_node':
         return handleDeleteNode(command);
-      case 'export_node':
-        return handleExportNode(command);
-      case 'list_components':
-        return handleListComponents(command);
+      
       default:
         throw new Error(`Unknown command: ${command.command}`);
     }
@@ -68,6 +72,34 @@ function processCommand(command) {
     // Log error
     console.error('Error processing command:', error);
   }
+}
+
+async function handleGetRootLayers(command) {
+  // Get all components in the document
+  const components = [];
+  
+  // Process local components
+  figma.root.children.forEach(page => {
+    // Function to recursively find components
+    const findComponents = (node) => {
+      components.push({
+        id: node.id,
+        name: node.name,
+        type: node.type,
+        key: node.type === 'COMPONENT' ? node.key : null
+      });
+    };
+    
+    // Start recursive search on this page
+    findComponents(page);
+  });
+  
+  // Send success response with component list
+  sendResponse(command.id, {
+    id: command.id,
+    success: true,
+    result: components
+  });
 }
 
 // Command handlers
@@ -93,6 +125,85 @@ async function handleGetSelection(command) {
       error: error.message || 'Unknown error'
     });
   }
+}
+
+async function handleGetNodeChildren(command) {
+  const { params } = command;
+
+  // Get node
+  const root = figma.getNodeById(params.nodeId);
+  if (!root) {
+    throw new Error(`Node not found: ${params.nodeId}`);
+  }
+  // Get all components of node
+  const components = [];
+
+  // Process local components
+  root.children.forEach(child => {
+    // Function to recursively find components
+    const findComponents = (node, list) => {
+      const component = {
+        id: node.id,
+        parent: node.parent ? node.parent.id : null,
+        name: node.name,
+        type: node.type,
+        key: node.type === 'COMPONENT' ? node.key : null,
+        children: []
+      };
+      list.push(component);
+      
+      // Check children
+      if ('children' in node) {
+        node.children.forEach((child) => {
+          findComponents(child, component.children)
+        });
+      }
+    };
+    
+    // Start recursive search on this page
+    findComponents(child, components);
+  });
+  
+  // Send success response with component list
+  sendResponse(command.id, {
+    id: command.id,
+    success: true,
+    result: components
+  });
+}
+
+
+async function handleExportNode(command) {
+  const { params } = command;
+  
+  // Get node
+  const node = figma.getNodeById(params.nodeId);
+  if (!node) {
+    throw new Error(`Node not found: ${params.nodeId}`);
+  }
+  
+  // Set export settings
+  const settings = {
+    format: params.format || 'PNG',
+    constraint: { type: 'SCALE', value: params.scale || 1 }
+  };
+  
+  // Export
+  const bytes = await node.exportAsync(settings);
+  
+  // Convert to base64 for transmission
+  const base64 = figma.base64Encode(bytes);
+  
+  // Send success response with export data
+  sendResponse(command.id, {
+    id: command.id,
+    success: true,
+    result: {
+      id: node.id,
+      format: settings.format,
+      data: base64
+    }
+  });
 }
 
 async function handleCreateRectangle(command) {
@@ -480,72 +591,6 @@ async function handleDeleteNode(command) {
   sendResponse(command.id, {
     id: command.id,
     success: true
-  });
-}
-
-async function handleExportNode(command) {
-  const { params } = command;
-  
-  // Get node
-  const node = figma.getNodeById(params.nodeId);
-  if (!node) {
-    throw new Error(`Node not found: ${params.nodeId}`);
-  }
-  
-  // Set export settings
-  const settings = {
-    format: params.format || 'PNG',
-    constraint: { type: 'SCALE', value: params.scale || 1 }
-  };
-  
-  // Export
-  const bytes = await node.exportAsync(settings);
-  
-  // Convert to base64 for transmission
-  const base64 = figma.base64Encode(bytes);
-  
-  // Send success response with export data
-  sendResponse(command.id, {
-    id: command.id,
-    success: true,
-    result: {
-      id: node.id,
-      format: settings.format,
-      data: base64
-    }
-  });
-}
-
-async function handleListComponents(command) {
-  // Get all components in the document
-  const components = [];
-  console.log(figma.root);
-  // Process local components
-  figma.root.children.forEach(page => {
-    // Function to recursively find components
-    const findComponents = (node) => {
-      components.push({
-        id: node.id,
-        name: node.name,
-        type: node.type,
-        key: node.type === 'COMPONENT' ? node.key : null
-      });
-      
-      // Check children
-      if ('children' in node) {
-        node.children.forEach(findComponents);
-      }
-    };
-    
-    // Start recursive search on this page
-    findComponents(page);
-  });
-  
-  // Send success response with component list
-  sendResponse(command.id, {
-    id: command.id,
-    success: true,
-    result: components
   });
 }
 
