@@ -185,17 +185,13 @@
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h2>Figma MCP Bridge</h2>
-      <span id="version">v1.1.0</span>
-    </div>
     
     <div id="status" class="status status-connecting">
       <div class="status-indicator"></div>
       <div id="status-message" class="status-message">Connecting to MCP server...</div>
     </div>
     
-    <div class="logs" id="logs">
+    <div class="logs show-details" id="logs">
       <p>Initializing plugin...</p>
     </div>
     
@@ -207,7 +203,7 @@
       </div>
       <div class="action-buttons">
         <button id="clear-logs-button">Clear Logs</button>
-        <button id="detail-toggle-button">Show Details</button>
+        <!-- <button id="detail-toggle-button">Show Details</button> -->
         <button id="reconnect-button">Stop</button>
       </div>
     </div>
@@ -230,7 +226,7 @@
     let receivedCount = 0;
     
     // Detail mode
-    let showDetails = false;
+    let showDetails = true;
     
     // Elements
     const statusEl = document.getElementById('status');
@@ -238,7 +234,7 @@
     const logsEl = document.getElementById('logs');
     const reconnectButton = document.getElementById('reconnect-button');
     const clearLogsButton = document.getElementById('clear-logs-button');
-    const detailToggleButton = document.getElementById('detail-toggle-button');
+    // const detailToggleButton = document.getElementById('detail-toggle-button');
     const sentCountEl = document.getElementById('sent-count');
     const receivedCountEl = document.getElementById('received-count');
     const resizeHandle = document.getElementById('resize-handle');
@@ -269,9 +265,9 @@
       clearLogs();
     });
     
-    detailToggleButton.addEventListener('click', () => {
-      toggleDetails();
-    });
+    // detailToggleButton.addEventListener('click', () => {
+    //   toggleDetails();
+    // });
     
     // Resizable logs
     let startY;
@@ -496,7 +492,7 @@
     // Clear logs
     function clearLogs() {
       logsEl.innerHTML = '';
-      addLogEntry('Logs cleared', 'command');
+      // addLogEntry('Logs cleared', 'command');
     }
     
     // Increment sent count

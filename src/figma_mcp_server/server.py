@@ -23,15 +23,15 @@ if sys.platform == "win32" and os.environ.get('PYTHONIOENCODING') is None:
     sys.stderr.reconfigure(encoding="utf-8")
 
 # 配置日志
-log_file = os.path.expanduser(f"./logs/{time.strftime('%Y-%m-%d')}.log")
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(log_file),
-        logging.StreamHandler()
-    ]
-)
+# log_file = os.path.expanduser(f"./logs/{time.strftime('%Y-%m-%d')}.log")
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+#     handlers=[
+#         logging.FileHandler(log_file),
+#         logging.StreamHandler()
+#     ]
+# )
 logger = logging.getLogger('figma-mcp-server')
 logger.info("Starting Figma MCP Server")
 
@@ -244,7 +244,7 @@ async def main():
             read_stream,
             write_stream,
             InitializationOptions(
-                server_name="minium",
+                server_name="figma",
                 server_version="0.1.0",
                 capabilities=server.get_capabilities(
                     notification_options=NotificationOptions(),
