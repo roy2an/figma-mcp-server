@@ -553,7 +553,7 @@
       }
       
       logsEl.insertBefore(entry, logsEl.firstChild);
-      logsEl.scrollTop = logsEl.scrollHeight;
+      logsEl.scrollTop = 0//logsEl.scrollHeight;
       
       // Limit log size
       while (logsEl.childElementCount > 100) {

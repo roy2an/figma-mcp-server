@@ -69,17 +69,8 @@ async def handle_websocket(websocket: WebSocketServerProtocol):
                     if response_data.get("success"):
                         result = response_data.get("result")
                         logger.debug(f"Command result: {result}")
-                        if isinstance(result, list):
-                            # 如果是列表，返回多个 TextContent
-                            items = []
-                            for item in result:
-                                text = repr(item) if isinstance(item, (dict, list)) else "{}".format(item)
-                                items.append(types.TextContent(type="text", text=text))
-                            future.set_result(items)
-                        else:
-                            # 如果是单个结果，返回一个 TextContent
-                            text = repr(result) if isinstance(result, (dict, list)) else "{}".format(result)
-                            future.set_result([types.TextContent(type="text", text=text)])
+                        text = repr(result) if isinstance(result, (dict, list)) else "{}".format(result)
+                        future.set_result([types.TextContent(type="text", text=text)])
                     else:
                         error = response_data.get("error", "Unknown error")
                         logger.error(f"Command {command_id} failed: {error}")
@@ -89,6 +80,7 @@ async def handle_websocket(websocket: WebSocketServerProtocol):
                     logger.debug(f"Cleaned up future for command {command_id}")
                     
                 # 发送确认消息
+                logger.debug(f"Sending confirmation message for command {command_id}")
                 response = {"type": "received", "message": "Success"}
                 await websocket.send(json.dumps(response))
             except json.JSONDecodeError:
