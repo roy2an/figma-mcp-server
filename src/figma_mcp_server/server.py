@@ -89,7 +89,7 @@ async def handle_websocket(websocket: WebSocketServerProtocol):
                     logger.debug(f"Cleaned up future for command {command_id}")
                     
                 # 发送确认消息
-                response = {"type": "answer", "message": "Message received"}
+                response = {"type": "received", "message": "Success"}
                 await websocket.send(json.dumps(response))
             except json.JSONDecodeError:
                 response = {"type": "error", "message": "Invalid JSON"}

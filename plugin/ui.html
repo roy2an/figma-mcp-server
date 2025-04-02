@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Figma MCP Bridge</title>
+  <title>Figma MCP</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -152,7 +152,11 @@
       font-size: 11px;
       color: #666;
       font-style: italic;
-      display: none;
+      /* display: none; */
+      background: #eee;
+      padding: 5px;
+      border-radius: 5px;
+      position: relative;
     }
     
     .show-details .details {
@@ -164,6 +168,9 @@
       padding: 2px 6px;
       margin-left: 6px;
       background-color: #7f8c8d;
+      position: absolute;
+      right: 10px;
+      top: 10px;
     }
     
     .resize-handle {
@@ -185,14 +192,13 @@
 </head>
 <body>
   <div class="container">
-    
     <div id="status" class="status status-connecting">
       <div class="status-indicator"></div>
-      <div id="status-message" class="status-message">Connecting to MCP server...</div>
+      <div id="status-message" class="status-message">Connecting to server...</div>
     </div>
     
     <div class="logs show-details" id="logs">
-      <p>Initializing plugin...</p>
+      <!-- <p>Initializing plugin...</p> -->
     </div>
     
     <div class="resize-handle" id="resize-handle"></div>
@@ -204,7 +210,7 @@
       <div class="action-buttons">
         <button id="clear-logs-button">Clear Logs</button>
         <!-- <button id="detail-toggle-button">Show Details</button> -->
-        <button id="reconnect-button">Stop</button>
+        <button id="reconnect-button">Reconnect Off</button>
       </div>
     </div>
   </div>
@@ -244,8 +250,8 @@
       if (autoReconnectEnabled) {
         // Stop auto-reconnect
         autoReconnectEnabled = false;
-        reconnectButton.textContent = 'Reconnect';
-        addLogEntry('Auto-reconnect disabled', 'command');
+        reconnectButton.textContent = 'Reconnect On';
+        // addLogEntry('Auto-reconnect disabled', 'command');
         
         // Clear existing reconnect interval
         if (reconnectInterval) {
@@ -255,8 +261,8 @@
       } else {
         // Re-enable auto-reconnect and connect immediately
         autoReconnectEnabled = true;
-        reconnectButton.textContent = 'Stop';
-        addLogEntry('Attempting to reconnect...', 'command');
+        reconnectButton.textContent = 'Reconnect Off';
+        // addLogEntry('Attempting to reconnect...', 'command'); 
         connectToServer();
       }
     });
@@ -310,7 +316,7 @@
         ws = new WebSocket(`ws://localhost:${wsServerPort}`);
         
         // Update status
-        updateStatus('connecting', 'Connecting to MCP server...');
+        updateStatus('connecting', 'Connecting...');
         
         // Connection opened
         ws.onopen = () => {
@@ -323,7 +329,7 @@
           }
           
           // Update status
-          updateStatus('connected', 'Connected to MCP server');
+          updateStatus('connected', 'Connected');
           
           // Send plugin info to server (will be provided by the plugin code)
           const pluginInfo = window.pluginInfo;
@@ -346,7 +352,7 @@
             
             // Log message
             console.log('Received message from server:', message);
-            addLogEntry(`Received: ${message.type}`, 'command', message);
+            addLogEntry(`MESSAGE: `, 'command', message);
             incrementReceived();
             
             // Forward message to plugin code
@@ -363,8 +369,8 @@
           
           // Update status
           updateStatus('disconnected', autoReconnectEnabled ? 
-            'Disconnected from MCP server. Reconnecting...' : 
-            'Disconnected from MCP server. Auto-reconnect disabled.'
+            'Disconnected. Reconnecting...' : 
+            'Disconnected. '
           );
           
           // Set up reconnection if enabled
@@ -379,7 +385,7 @@
           
           // Update status
           updateStatus('error', 'WebSocket connection error');
-          addLogEntry(`WebSocket error: ${error.message || 'Unknown error'}`, 'error');
+          // addLogEntry(`WebSocket error: ${error.message || 'Unknown error'}`, 'error');
         };
       } catch (error) {
         console.error('Error connecting to WebSocket server:', error);
@@ -456,14 +462,14 @@
       connectionStatus = status;
       
       // Add log entry
-      addLogEntry(message, status);
+      // addLogEntry(message, status);
       
       // Update reconnect/stop button
       if (status === 'connected' || status === 'connecting') {
-        reconnectButton.textContent = 'Stop';
+        reconnectButton.textContent = 'Reconnect Off';
         reconnectButton.disabled = false;
       } else if (status === 'disconnected' || status === 'error') {
-        reconnectButton.textContent = autoReconnectEnabled ? 'Stop' : 'Reconnect';
+        reconnectButton.textContent = autoReconnectEnabled ? 'Reconnect Off' : 'Reconnect On';
         reconnectButton.disabled = false;
       }
       
@@ -539,14 +545,14 @@
             });
         };
         
-        mainText.appendChild(copyBtn);
+        detailsEl.appendChild(copyBtn);
         entry.appendChild(mainText);
         entry.appendChild(detailsEl);
       } else {
         entry.appendChild(mainText);
       }
       
-      logsEl.appendChild(entry);
+      logsEl.insertBefore(entry, logsEl.firstChild);
       logsEl.scrollTop = logsEl.scrollHeight;
       
       // Limit log size
