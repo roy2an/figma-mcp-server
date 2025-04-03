@@ -28,8 +28,10 @@ function processCommand(command) {
     
     // Dispatch to appropriate command handler
     switch (command.command) {
-      case 'get_root_layers':
-        return handleGetRootLayers(command);
+      case 'get_pages':
+        return handleGetPages(command);
+      case 'get_root_layers_of_page':
+        return handleGetRootLayersOfPage(command);
       case 'get_selection':
         return handleGetSelection(command);
       case 'get_node_children':
@@ -74,7 +76,7 @@ function processCommand(command) {
   }
 }
 
-async function handleGetRootLayers(command) {
+async function handleGetPages(command) {
   // Get all components in the document
   const components = [];
   
@@ -92,6 +94,44 @@ async function handleGetRootLayers(command) {
     
     // Start recursive search on this page
     findComponents(page);
+  });
+  
+  // Send success response with component list
+  sendResponse(command.id, {
+    type: 'text',
+    success: true,
+    result: components
+  });
+}
+
+
+async function handleGetRootLayersOfPage(command) {
+  const { params } = command;
+
+  // Get node
+  const root = figma.getNodeById(params.pageId);
+  if (!root) {
+    throw new Error(`Node not found: ${params.pageId}`);
+  }
+  // Get all components of node
+  const components = [];
+
+  // Process local components
+  root.children.forEach(child => {
+    // Function to recursively find components
+    const findComponents = (node, list) => {
+      const component = {
+        id: node.id,
+        parent: node.parent ? node.parent.id : null,
+        name: node.name,
+        type: node.type,
+        key: node.type === 'COMPONENT' ? node.key : null,
+      };
+      list.push(component);
+    };
+    
+    // Start recursive search on this page
+    findComponents(child, components);
   });
   
   // Send success response with component list

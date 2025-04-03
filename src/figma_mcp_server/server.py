@@ -118,12 +118,26 @@ async def main():
         """List available tools"""
         return [
             types.Tool(
-                name="figma_get_root_layers",
-                description="Get all root layers of the document in Figma",
+                name="figma_get_pages",
+                description="Get all pages of the document in Figma",
                 inputSchema={
                     "type": "object",
                     "properties": {},
                     "required": [],
+                }
+            ),
+            types.Tool(
+                name="figma_get_root_layers_of_page",
+                description="Get all layers of a specific page in Figma",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "pageId": {
+                            "type": "string",
+                            "description": "ID of the page to get layers from"
+                        }
+                    },
+                    "required": ["pageId"],
                 }
             ),
             types.Tool(
