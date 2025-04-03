@@ -68,9 +68,13 @@ async def handle_websocket(websocket: WebSocketServerProtocol):
                     response_data = data.get("data", {})
                     if response_data.get("success"):
                         result = response_data.get("result")
+                        type = response_data.get("type")
                         logger.debug(f"Command result: {result}")
-                        text = repr(result) if isinstance(result, (dict, list)) else "{}".format(result)
-                        future.set_result([types.TextContent(type="text", text=text)])
+                        if type == "image":
+                            future.set_result([types.ImageContent(type="image", mimeType="image/png", data=result.get('data'))])
+                        else:
+                            text = repr(result) if isinstance(result, (dict, list)) else "{}".format(result)
+                            future.set_result([types.TextContent(type="text", text=text)])
                     else:
                         error = response_data.get("error", "Unknown error")
                         logger.error(f"Command {command_id} failed: {error}")

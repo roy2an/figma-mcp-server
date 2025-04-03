@@ -64,7 +64,7 @@ function processCommand(command) {
   } catch (error) {
     // Send error response
     sendResponse(command.id, {
-      id: command.id,
+      type: 'text',
       success: false,
       error: error.message
     });
@@ -96,7 +96,7 @@ async function handleGetRootLayers(command) {
   
   // Send success response with component list
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true,
     result: components
   });
@@ -113,14 +113,14 @@ async function handleGetSelection(command) {
     }));
     
     sendResponse(command.id, {
-      id: command.id,
+      type: 'text',
       success: true,
       result
     });
   } catch (error) {
     console.error('Error in handleGetSelection:', error);
     sendResponse(command.id, {
-      id: command.id,
+      type: 'text',
       success: false,
       error: error.message || 'Unknown error'
     });
@@ -166,7 +166,7 @@ async function handleGetNodeChildren(command) {
   
   // Send success response with component list
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true,
     result: components
   });
@@ -196,7 +196,7 @@ async function handleExportNode(command) {
   
   // Send success response with export data
   sendResponse(command.id, {
-    id: command.id,
+    type: 'image',
     success: true,
     result: {
       id: node.id,
@@ -246,14 +246,14 @@ async function handleCreateRectangle(command) {
     
     // Send success response with node ID
     sendResponse(command.id, {
-      id: command.id,
+      type: 'text',
       success: true,
       result: { id: rect.id }
     });
   } catch (error) {
     console.error('Error in handleCreateRectangle:', error);
     sendResponse(command.id, {
-      id: command.id,
+      type: 'text',
       success: false,
       error: error.message || 'Unknown error'
     });
@@ -317,7 +317,7 @@ async function handleCreateText(command) {
   
   // Send success response with node ID
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true,
     result: { id: text.id }
   });
@@ -352,7 +352,7 @@ async function handleCreateFrame(command) {
   
   // Send success response with node ID
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true,
     result: { id: frame.id }
   });
@@ -393,7 +393,7 @@ async function handleCreateComponent(command) {
   
   // Send success response with node ID and component key
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true,
     result: { 
       id: component.id,
@@ -443,7 +443,7 @@ async function handleCreateInstance(command) {
   
   // Send success response with node ID
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true,
     result: { id: instance.id }
   });
@@ -468,7 +468,7 @@ async function handleSetFill(command) {
   
   // Send success response
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true,
     result: { id: node.id }
   });
@@ -507,7 +507,7 @@ async function handleSetStroke(command) {
   
   // Send success response
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true,
     result: { id: node.id }
   });
@@ -543,7 +543,7 @@ async function handleSetEffects(command) {
   
   // Send success response
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true,
     result: { id: node.id }
   });
@@ -569,7 +569,7 @@ async function handleUpdateNode(command) {
   
   // Send success response
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true,
     result: { id: node.id }
   });
@@ -589,7 +589,7 @@ async function handleDeleteNode(command) {
   
   // Send success response
   sendResponse(command.id, {
-    id: command.id,
+    type: 'text',
     success: true
   });
 }
